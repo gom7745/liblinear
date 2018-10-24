@@ -1,0 +1,10 @@
+*.o
+*.un~
+.gdb_history
+blas
+log*
+model*
+out*
+predict
+train
+weight

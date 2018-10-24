@@ -8,6 +8,7 @@
 #include "tron.h"
 int liblinear_version = LIBLINEAR_VERSION;
 typedef signed char schar;
+/*
 template <class T> static inline void swap(T& x, T& y) { T t=x; x=y; y=t; }
 #ifndef min
 template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
@@ -15,6 +16,7 @@ template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
 #ifndef max
 template <class T> static inline T max(T x,T y) { return (x>y)?x:y; }
 #endif
+*/
 template <class S, class T> static inline void clone(T*& dst, S* src, int n)
 {
 	dst = new T[n];
@@ -2654,7 +2656,7 @@ void find_parameter_C(const problem *prob, const parameter *param, int nr_fold, 
 	free(subprob);
 }
 
-double predict_values(const struct model *model_, const struct feature_node *x, double *dec_values)
+double predict_values(const struct model *model_, const struct feature_node *x, double *dec_values, const bool analyze, analysis *anal)
 {
 	int idx;
 	int n;
@@ -2674,16 +2676,27 @@ double predict_values(const struct model *model_, const struct feature_node *x, 
 	const feature_node *lx=x;
 	for(i=0;i<nr_w;i++)
 		dec_values[i] = 0;
+    vector<double> t;
+    vector<int> p;
 	for(; (idx=lx->index)!=-1; lx++)
 	{
 		// the dimension of testing data may exceed that of training
 		if(idx<=n)
-			for(i=0;i<nr_w;i++)
-				dec_values[i] += w[(idx-1)*nr_w+i]*lx->value;
+			for(i=0;i<nr_w;i++) {
+				double tmp_t = w[(idx-1)*nr_w+i]*lx->value;
+                dec_values[i] += tmp_t;
+                if(analyze && nr_class==2) {
+                    t.push_back(tmp_t);
+                }
+            }
 	}
 
 	if(nr_class==2)
 	{
+        if(analyze) {
+            anal->wa.push_back(t);
+            anal->pa.push_back(p);
+        }
 		if(check_regression_model(model_))
 			return dec_values[0];
 		else
@@ -2701,15 +2714,15 @@ double predict_values(const struct model *model_, const struct feature_node *x, 
 	}
 }
 
-double predict(const model *model_, const feature_node *x)
+double predict(const model *model_, const feature_node *x, const bool analyze, analysis *anal)
 {
 	double *dec_values = Malloc(double, model_->nr_class);
-	double label=predict_values(model_, x, dec_values);
+	double label=predict_values(model_, x, dec_values, analyze, anal);
 	free(dec_values);
 	return label;
 }
 
-double predict_probability(const struct model *model_, const struct feature_node *x, double* prob_estimates)
+double predict_probability(const struct model *model_, const struct feature_node *x, double* prob_estimates, const bool analyze, analysis *anal)
 {
 	if(check_probability_model(model_))
 	{
@@ -2721,7 +2734,7 @@ double predict_probability(const struct model *model_, const struct feature_node
 		else
 			nr_w = nr_class;
 
-		double label=predict_values(model_, x, prob_estimates);
+		double label=predict_values(model_, x, prob_estimates, analyze, anal);
 		for(i=0;i<nr_w;i++)
 			prob_estimates[i]=1/(1+exp(-prob_estimates[i]));
 
@@ -2849,7 +2862,7 @@ struct model *load_model(const char *model_file_name)
 	// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
 	param.nr_weight = 0;
 	param.weight_label = NULL;
-	param.weight = NULL;	
+	param.weight = NULL;
 	param.init_sol = NULL;
 
 	model_->label = NULL;
