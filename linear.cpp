@@ -107,7 +107,7 @@ private:
 
 l2r_lr_fun::l2r_lr_fun(const problem *prob, double *C)
 {
-	int l=prob->l;
+	long long l=prob->l;
 
 	this->prob = prob;
 
@@ -125,10 +125,10 @@ l2r_lr_fun::~l2r_lr_fun()
 
 double l2r_lr_fun::fun(double *w)
 {
-	int i;
+	long long i;
 	double f=0;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 
 	Xv(w, z);
@@ -150,10 +150,10 @@ double l2r_lr_fun::fun(double *w)
 
 void l2r_lr_fun::grad(double *w, double *g)
 {
-	int i;
+	long long i;
 	double *y=prob->y;
-	int l=prob->l;
-	int w_size=get_nr_variable();
+	long long l=prob->l;
+    int w_size=get_nr_variable();
 
 	for(i=0;i<l;i++)
 	{
@@ -174,8 +174,8 @@ int l2r_lr_fun::get_nr_variable(void)
 
 void l2r_lr_fun::get_diag_preconditioner(double *M)
 {
-	int i;
-	int l = prob->l;
+	long long i;
+	long long l = prob->l;
 	int w_size=get_nr_variable();
 	feature_node **x = prob->x;
 
@@ -195,8 +195,8 @@ void l2r_lr_fun::get_diag_preconditioner(double *M)
 
 void l2r_lr_fun::Hv(double *s, double *Hs)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+    long long l=prob->l;
 	int w_size=get_nr_variable();
 	feature_node **x=prob->x;
 
@@ -217,8 +217,8 @@ void l2r_lr_fun::Hv(double *s, double *Hs)
 
 void l2r_lr_fun::Xv(double *v, double *Xv)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+	long long l=prob->l;
 	feature_node **x=prob->x;
 
 	for(i=0;i<l;i++)
@@ -227,8 +227,8 @@ void l2r_lr_fun::Xv(double *v, double *Xv)
 
 void l2r_lr_fun::XTv(double *v, double *XTv)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 	feature_node **x=prob->x;
 
@@ -264,7 +264,7 @@ protected:
 
 l2r_l2_svc_fun::l2r_l2_svc_fun(const problem *prob, double *C)
 {
-	int l=prob->l;
+	long long l=prob->l;
 
 	this->prob = prob;
 
@@ -281,10 +281,10 @@ l2r_l2_svc_fun::~l2r_l2_svc_fun()
 
 double l2r_l2_svc_fun::fun(double *w)
 {
-	int i;
+	long long i;
 	double f=0;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 
 	Xv(w, z);
@@ -305,9 +305,9 @@ double l2r_l2_svc_fun::fun(double *w)
 
 void l2r_l2_svc_fun::grad(double *w, double *g)
 {
-	int i;
+	long long i;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 
 	sizeI = 0;
@@ -331,8 +331,8 @@ int l2r_l2_svc_fun::get_nr_variable(void)
 
 void l2r_l2_svc_fun::get_diag_preconditioner(double *M)
 {
-	int i;
-	int w_size=get_nr_variable();
+	long long i;
+    int w_size=get_nr_variable();
 	feature_node **x = prob->x;
 
 	for (i=0; i<w_size; i++)
@@ -373,8 +373,8 @@ void l2r_l2_svc_fun::Hv(double *s, double *Hs)
 
 void l2r_l2_svc_fun::Xv(double *v, double *Xv)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+	long long l=prob->l;
 	feature_node **x=prob->x;
 
 	for(i=0;i<l;i++)
@@ -383,7 +383,7 @@ void l2r_l2_svc_fun::Xv(double *v, double *Xv)
 
 void l2r_l2_svc_fun::subXTv(double *v, double *XTv)
 {
-	int i;
+	long long i;
 	int w_size=get_nr_variable();
 	feature_node **x=prob->x;
 
@@ -413,10 +413,10 @@ l2r_l2_svr_fun::l2r_l2_svr_fun(const problem *prob, double *C, double p):
 
 double l2r_l2_svr_fun::fun(double *w)
 {
-	int i;
+	long long i;
 	double f=0;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 	double d;
 
@@ -439,9 +439,9 @@ double l2r_l2_svr_fun::fun(double *w)
 
 void l2r_l2_svr_fun::grad(double *w, double *g)
 {
-	int i;
+	long long i;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 	double d;
 
@@ -504,7 +504,7 @@ class Solver_MCSVM_CS
 		void solve_sub_problem(double A_i, int yi, double C_yi, int active_i, double *alpha_new);
 		bool be_shrunk(int i, int m, int yi, double alpha_i, double minG);
 		double *B, *C, *G;
-		int w_size, l;
+		long long w_size, l;
 		int nr_class;
 		int max_iter;
 		double eps;
@@ -820,9 +820,10 @@ static void solve_l2r_l1l2_svc(
 	const problem *prob, double *w, double eps,
 	double Cp, double Cn, int solver_type)
 {
-	int l = prob->l;
-	int w_size = prob->n;
-	int i, s, iter = 0;
+	long long l = prob->l;
+	long long w_size = prob->n;
+	long long i;
+    int s, iter = 0;
 	double C, d, G;
 	double *QD = new double[l];
 	int max_iter = 1000;
@@ -1023,12 +1024,13 @@ static void solve_l2r_l1l2_svr(
 	const problem *prob, double *w, const parameter *param,
 	int solver_type)
 {
-	int l = prob->l;
+	long long l = prob->l;
 	double C = param->C;
 	double p = param->p;
-	int w_size = prob->n;
+	long long w_size = prob->n;
 	double eps = param->eps;
-	int i, s, iter = 0;
+	long long i;
+    int s, iter = 0;
 	int max_iter = 1000;
 	int active_size = l;
 	int *index = new int[l];
@@ -1229,9 +1231,10 @@ static void solve_l2r_l1l2_svr(
 
 void solve_l2r_lr_dual(const problem *prob, double *w, double eps, double Cp, double Cn)
 {
-	int l = prob->l;
-	int w_size = prob->n;
-	int i, s, iter = 0;
+	long long l = prob->l;
+	long long w_size = prob->n;
+	long long i;
+    int s, iter = 0;
 	double *xTx = new double[l];
 	int max_iter = 1000;
 	int *index = new int[l];
@@ -1389,9 +1392,10 @@ static void solve_l1r_l2_svc(
 	problem *prob_col, double *w, double eps,
 	double Cp, double Cn)
 {
-	int l = prob_col->l;
-	int w_size = prob_col->n;
-	int j, s, iter = 0;
+	long long l = prob_col->l;
+	long long w_size = prob_col->n;
+	long long j;
+    int s, iter = 0;
 	int max_iter = 1000;
 	int active_size = w_size;
 	int max_num_linesearch = 20;
@@ -1461,7 +1465,7 @@ static void solve_l1r_l2_svc(
 			x = prob_col->x[j];
 			while(x->index != -1)
 			{
-				int ind = x->index-1;
+				long long ind = x->index-1;
 				if(b[ind] > 0)
 				{
 					double val = x->value;

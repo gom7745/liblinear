@@ -20,7 +20,8 @@ struct feature_node
 
 struct problem
 {
-	int l, n;
+	long long l;
+    int n;
 	double *y;
 	struct feature_node **x;
 	double bias;            /* < 0 if no bias term */

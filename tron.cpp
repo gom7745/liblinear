@@ -75,7 +75,7 @@ void TRON::tron(double *w)
 	// Parameters for updating the trust region size delta.
 	double sigma1 = 0.25, sigma2 = 0.5, sigma3 = 4;
 
-	int n = fun_obj->get_nr_variable();
+    int n = fun_obj->get_nr_variable();
 	int i, cg_iter;
 	double delta=0, sMnorm, one=1.0;
 	double alpha, f, fnew, prered, actred, gs;
