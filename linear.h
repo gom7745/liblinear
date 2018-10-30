@@ -1,10 +1,7 @@
 #ifndef _LIBLINEAR_H
 #define _LIBLINEAR_H
 
-#include <string>
-#include <vector>
-using namespace std;
-#define LIBLINEAR_VERSION 221
+#define LIBLINEAR_VERSION 220
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,8 +17,7 @@ struct feature_node
 
 struct problem
 {
-	long long l;
-    int n;
+	int l, n;
 	double *y;
 	struct feature_node **x;
 	double bias;            /* < 0 if no bias term */
@@ -36,6 +32,7 @@ struct parameter
 	/* these are for training only */
 	double eps;	        /* stopping criteria */
 	double C;
+	int nr_thread;
 	int nr_weight;
 	int *weight_label;
 	double* weight;
@@ -53,22 +50,13 @@ struct model
 	double bias;
 };
 
-struct analysis {
-    string wa_path;
-    string pa_path;
-    FILE *f_wa;
-    FILE *f_pa;
-    vector<vector<double> > wa;
-    vector<vector<int> > pa;
-};
-
 struct model* train(const struct problem *prob, const struct parameter *param);
 void cross_validation(const struct problem *prob, const struct parameter *param, int nr_fold, double *target);
 void find_parameter_C(const struct problem *prob, const struct parameter *param, int nr_fold, double start_C, double max_C, double *best_C, double *best_rate);
 
-double predict_values(const struct model *model_, const struct feature_node *x, double* dec_values, const bool analyze=false, analysis *anal=NULL);
-double predict(const struct model *model_, const struct feature_node *x, const bool analyze=false, analysis *anal=NULL);
-double predict_probability(const struct model *model_, const struct feature_node *x, double* prob_estimates, const bool analyze=false, analysis *anal=NULL);
+double predict_values(const struct model *model_, const struct feature_node *x, double* dec_values);
+double predict(const struct model *model_, const struct feature_node *x);
+double predict_probability(const struct model *model_, const struct feature_node *x, double* prob_estimates);
 
 int save_model(const char *model_file_name, const struct model *model_);
 struct model *load_model(const char *model_file_name);

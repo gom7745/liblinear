@@ -42,12 +42,7 @@ static char* readline(FILE *input)
 	return line;
 }
 
-struct Option{
-    bool analyze = false;
-    analysis anal;
-};
-
-void do_predict(FILE *input, FILE *output, Option opt)
+void do_predict(FILE *input, FILE *output)
 {
 	int correct = 0;
 	int total = 0;
@@ -82,11 +77,6 @@ void do_predict(FILE *input, FILE *output, Option opt)
 		fprintf(output,"\n");
 		free(labels);
 	}
-
-    if(opt.analyze) {
-        opt.anal.f_wa = fopen(opt.anal.wa_path.c_str(), "w");
-        //opt.anal.f_pa = fopen(opt.anal.pa_path.c_str(), "w");
-    }
 
 	max_line_len = 1024;
 	line = (char *)malloc(max_line_len*sizeof(char));
@@ -146,7 +136,7 @@ void do_predict(FILE *input, FILE *output, Option opt)
 		if(flag_predict_probability)
 		{
 			int j;
-			predict_label = predict_probability(model_,x,prob_estimates,opt.analyze,&opt.anal);
+			predict_label = predict_probability(model_,x,prob_estimates);
 			fprintf(output,"%g",predict_label);
 			for(j=0;j<model_->nr_class;j++)
 				fprintf(output," %g",prob_estimates[j]);
@@ -154,8 +144,8 @@ void do_predict(FILE *input, FILE *output, Option opt)
 		}
 		else
 		{
-			predict_label = predict(model_,x,opt.analyze,&opt.anal);
-			fprintf(output,"%.17g\n",predict_label);
+			predict_label = predict(model_,x);
+			fprintf(output,"%g\n",predict_label);
 		}
 
 		if(predict_label == target_label)
@@ -168,14 +158,6 @@ void do_predict(FILE *input, FILE *output, Option opt)
 		sumpt += predict_label*target_label;
 		++total;
 	}
-    if(opt.analyze) {
-        for(int i=0; i < total; i++) {
-            long unsigned int combinations = opt.anal.wa[i].size();
-            for(long unsigned int j=0; j<combinations; j++)
-                fprintf((opt.anal.f_wa), "%lf,", opt.anal.wa[i][j]);
-            fprintf((opt.anal.f_wa), "\n");
-        }
-    }
 	if(check_regression_model(model_))
 	{
 		info("Mean squared error = %g (regression)\n",error/total);
@@ -196,9 +178,6 @@ void exit_with_help()
 	"Usage: predict [options] test_file model_file output_file\n"
 	"options:\n"
 	"-b probability_estimates: whether to output probability estimates, 0 or 1 (default 0); currently for logistic regression only\n"
-    "--analyze:print feature pairs corresponding weight*value\n"
-    "-wp <weight path> set path to the analysis weight file\n"
-    "-pp <pair path> set path to the analysis pair file\n"
 	"-q : quiet mode (no outputs)\n"
 	);
 	exit(1);
@@ -207,35 +186,10 @@ void exit_with_help()
 int main(int argc, char **argv)
 {
 	FILE *input, *output;
-    Option opt;
-	int i=1;
-    for(;i < argc; i++) {
-        if (strcmp(argv[i], "-b") == 0) {
-            i++;
-	        flag_predict_probability = atoi(argv[i]);
-        } else if (strcmp(argv[i], "-q") == 0) {
-			info = &print_null;
-			i--;
-        } else if (strcmp(argv[i], "--analyze") == 0) {
-            opt.analyze = true;
-        } else if (strcmp(argv[i], "-wp") == 0) {
-            if (i == argc - 1)
-				fprintf(stderr,"need to specify wieght path after -wp\n");
-            i++;
-            opt.anal.wa_path = argv[i];
-        } else if (strcmp(argv[i], "-pp") == 0) {
-            if (i == argc - 1)
-				fprintf(stderr,"need to specify pair path after -pp\n");
-            i++;
-            //opt.anal.pa_path = argv[i];
-        } else {
-            break;
-        }
-   }
+	int i;
 
 	// parse options
-    /*
-    for(;i<argc;i++)
+	for(i=1;i<argc;i++)
 	{
 		if(argv[i][0] != '-') break;
 		++i;
@@ -254,9 +208,6 @@ int main(int argc, char **argv)
 				break;
 		}
 	}
-    */
-    if (i != argc - 3)
-        fprintf(stderr,"cannot parse command\n");
 	if(i>=argc)
 		exit_with_help();
 
@@ -281,7 +232,7 @@ int main(int argc, char **argv)
 	}
 
 	x = (struct feature_node *) malloc(max_nr_attr*sizeof(struct feature_node));
-	do_predict(input, output, opt);
+	do_predict(input, output);
 	free_and_destroy_model(&model_);
 	free(line);
 	free(x);
