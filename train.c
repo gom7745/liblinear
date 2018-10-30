@@ -57,9 +57,9 @@ void exit_with_help()
 	exit(1);
 }
 
-void exit_input_error(int line_num)
+void exit_input_error(long long line_num)
 {
-	fprintf(stderr,"Wrong input format at line %d\n", line_num);
+	fprintf(stderr,"Wrong input format at line %lld\n", line_num);
 	exit(1);
 }
 
@@ -200,7 +200,7 @@ void do_cross_validation()
 
 void parse_command_line(int argc, char **argv, char *input_file_name, char *model_file_name)
 {
-	int i;
+	long long i;
 	void (*print_func)(const char*) = NULL;	// default printing to stdout
 
 	// default values
@@ -399,7 +399,8 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 // read in a problem (in libsvm format)
 void read_problem(const char *filename)
 {
-	int max_index, inst_max_index, i;
+	int max_index, inst_max_index;
+    long long i;
 	size_t elements, j;
 	FILE *fp = fopen(filename,"r");
 	char *endptr;

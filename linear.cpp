@@ -9,6 +9,7 @@
 #include <omp.h>
 int liblinear_version = LIBLINEAR_VERSION;
 typedef signed char schar;
+/*
 template <class T> static inline void swap(T& x, T& y) { T t=x; x=y; y=t; }
 #ifndef min
 template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
@@ -16,6 +17,7 @@ template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
 #ifndef max
 template <class T> static inline T max(T x,T y) { return (x>y)?x:y; }
 #endif
+*/
 template <class S, class T> static inline void clone(T*& dst, S* src, int n)
 {
 	dst = new T[n];
@@ -187,7 +189,7 @@ private:
 
 l2r_lr_fun::l2r_lr_fun(const problem *prob, double *C)
 {
-	int l=prob->l;
+	long long l=prob->l;
 
 	this->prob = prob;
 
@@ -209,10 +211,10 @@ l2r_lr_fun::~l2r_lr_fun()
 
 double l2r_lr_fun::fun(double *w)
 {
-	int i;
+	long long i;
 	double f=0;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 
 	Xv(w, z);
@@ -236,9 +238,9 @@ double l2r_lr_fun::fun(double *w)
 
 void l2r_lr_fun::grad(double *w, double *g)
 {
-	int i;
+	long long i;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 
 #pragma omp parallel for private(i) schedule(static)
@@ -262,8 +264,8 @@ int l2r_lr_fun::get_nr_variable(void)
 
 void l2r_lr_fun::Hv(double *s, double *Hs)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 	feature_node **x=prob->x;
 
@@ -288,8 +290,8 @@ void l2r_lr_fun::Hv(double *s, double *Hs)
 
 void l2r_lr_fun::get_diagH(double *M)
 {
-	int i;
-	int l = prob->l;
+	long long i;
+	long long l = prob->l;
 	int w_size=get_nr_variable();
 	feature_node **x = prob->x;
 
@@ -309,8 +311,8 @@ void l2r_lr_fun::get_diagH(double *M)
 
 void l2r_lr_fun::Xv(double *v, double *Xv)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+	long long l=prob->l;
 	feature_node **x=prob->x;
 
 #pragma omp parallel for private (i) schedule(guided)
@@ -320,8 +322,8 @@ void l2r_lr_fun::Xv(double *v, double *Xv)
 
 void l2r_lr_fun::XTv(double *v, double *XTv)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+	long long l=prob->l;
 	feature_node **x=prob->x;
 
 	reduce_vectors->init();
@@ -329,7 +331,7 @@ void l2r_lr_fun::XTv(double *v, double *XTv)
 #pragma omp parallel for private(i) schedule(guided)
 	for(i=0;i<l;i++)
 		reduce_vectors->sum_scale_x(v[i], x[i]);
-	
+
 	reduce_vectors->reduce_sum(XTv);
 }
 
@@ -361,7 +363,7 @@ protected:
 
 l2r_l2_svc_fun::l2r_l2_svc_fun(const problem *prob, double *C)
 {
-	int l=prob->l;
+	long long l=prob->l;
 
 	this->prob = prob;
 
@@ -382,10 +384,10 @@ l2r_l2_svc_fun::~l2r_l2_svc_fun()
 
 double l2r_l2_svc_fun::fun(double *w)
 {
-	int i;
+	long long i;
 	double f=0;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 
 	Xv(w, z);
@@ -408,9 +410,9 @@ double l2r_l2_svc_fun::fun(double *w)
 
 void l2r_l2_svc_fun::grad(double *w, double *g)
 {
-	int i;
+	long long i;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 
 	sizeI = 0;
@@ -435,7 +437,7 @@ int l2r_l2_svc_fun::get_nr_variable(void)
 
 void l2r_l2_svc_fun::get_diagH(double *M)
 {
-	int i;
+	long long i;
 	int w_size=get_nr_variable();
 	feature_node **x = prob->x;
 
@@ -456,7 +458,7 @@ void l2r_l2_svc_fun::get_diagH(double *M)
 
 void l2r_l2_svc_fun::Hv(double *s, double *Hs)
 {
-	int i;
+	long long i;
 	int w_size=get_nr_variable();
 	feature_node **x=prob->x;
 
@@ -472,7 +474,7 @@ void l2r_l2_svc_fun::Hv(double *s, double *Hs)
 
 		reduce_vectors->sum_scale_x(xTs, xi);
 	}
-	
+
 	reduce_vectors->reduce_sum(Hs);
 #pragma omp parallel for private(i) schedule(static)
 	for(i=0;i<w_size;i++)
@@ -481,8 +483,8 @@ void l2r_l2_svc_fun::Hv(double *s, double *Hs)
 
 void l2r_l2_svc_fun::Xv(double *v, double *Xv)
 {
-	int i;
-	int l=prob->l;
+	long long i;
+	long long l=prob->l;
 	feature_node **x=prob->x;
 
 #pragma omp parallel for private(i) schedule(guided)
@@ -492,7 +494,7 @@ void l2r_l2_svc_fun::Xv(double *v, double *Xv)
 
 void l2r_l2_svc_fun::subXTv(double *v, double *XTv)
 {
-	int i;
+	long long i;
 	feature_node **x=prob->x;
 
 	reduce_vectors->init();
@@ -524,10 +526,10 @@ l2r_l2_svr_fun::l2r_l2_svr_fun(const problem *prob, double *C, double p):
 
 double l2r_l2_svr_fun::fun(double *w)
 {
-	int i;
+	long long i;
 	double f=0;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 	double d;
 
@@ -552,9 +554,9 @@ double l2r_l2_svr_fun::fun(double *w)
 
 void l2r_l2_svr_fun::grad(double *w, double *g)
 {
-	int i;
+	long long i;
 	double *y=prob->y;
-	int l=prob->l;
+	long long l=prob->l;
 	int w_size=get_nr_variable();
 	double d;
 
@@ -618,7 +620,8 @@ class Solver_MCSVM_CS
 		void solve_sub_problem(double A_i, int yi, double C_yi, int active_i, double *alpha_new);
 		bool be_shrunk(int i, int m, int yi, double alpha_i, double minG);
 		double *B, *C, *G;
-		int w_size, l;
+		int w_size;
+		long long l;
 		int nr_class;
 		int max_iter;
 		double eps;
@@ -934,9 +937,10 @@ static void solve_l2r_l1l2_svc(
 	const problem *prob, double *w, double eps,
 	double Cp, double Cn, int solver_type)
 {
-	int l = prob->l;
+	long long l = prob->l;
 	int w_size = prob->n;
-	int i, s, iter = 0;
+	long long i;
+	int s, iter = 0;
 	double C, d;
 	double *QD = new double[l];
 	int max_iter = 1000;
@@ -1205,12 +1209,13 @@ static void solve_l2r_l1l2_svr(
 	const problem *prob, double *w, const parameter *param,
 	int solver_type)
 {
-	int l = prob->l;
+	long long l = prob->l;
 	double C = param->C;
 	double p = param->p;
 	int w_size = prob->n;
 	double eps = param->eps;
-	int i, s, iter = 0;
+	long long i;
+	int s, iter = 0;
 	int max_iter = 1000;
 	int active_size = l;
 	int *index = new int[l];
@@ -1411,9 +1416,10 @@ static void solve_l2r_l1l2_svr(
 
 void solve_l2r_lr_dual(const problem *prob, double *w, double eps, double Cp, double Cn)
 {
-	int l = prob->l;
+	long long l = prob->l;
 	int w_size = prob->n;
-	int i, s, iter = 0;
+	long long i;
+	int s, iter = 0;
 	double *xTx = new double[l];
 	int max_iter = 1000;
 	int *index = new int[l];
@@ -1571,9 +1577,10 @@ static void solve_l1r_l2_svc(
 	problem *prob_col, double *w, double eps,
 	double Cp, double Cn)
 {
-	int l = prob_col->l;
+	long long l = prob_col->l;
 	int w_size = prob_col->n;
-	int j, s, iter = 0;
+	long long j;
+	int s, iter = 0;
 	int max_iter = 1000;
 	int active_size = w_size;
 	int max_num_linesearch = 20;
@@ -1615,15 +1622,15 @@ static void solve_l1r_l2_svc(
 		index[j] = j;
 		xj_sq[j] = 0;
 		x = prob_col->x[j];
-		nnz_per_feature[j] = 0;	
+		nnz_per_feature[j] = 0;
 		while(x->index != -1)
 		{
-			int ind = x->index-1;
+			long long ind = x->index-1;
 			x->value *= y[ind]; // x->value stores yi*xij
 			double val = x->value;
 			b[ind] -= w[j]*val;
 			xj_sq[j] += C[GETI(ind)]*val*val;
-			nnz_per_feature[j]++;	
+			nnz_per_feature[j]++;
 			x++;
 		}
 	}
@@ -1646,7 +1653,7 @@ static void solve_l1r_l2_svc(
 			H = 0;
 
 			x = prob_col->x[j];
-			if(nnz_per_feature[j] < omp_threshold) 
+			if(nnz_per_feature[j] < omp_threshold)
 			{
 				while(x->index != -1)
 				{
@@ -1731,7 +1738,7 @@ static void solve_l1r_l2_svc(
 				if(appxcond <= 0)
 				{
 					x = prob_col->x[j];
-					if(nnz_per_feature[j] < omp_threshold) 
+					if(nnz_per_feature[j] < omp_threshold)
 						sparse_operator::axpy(d_diff, x, b);
 					else
 						sparse_operator::axpy_omp(d_diff, x, b, nnz_per_feature[j]);
@@ -1743,7 +1750,7 @@ static void solve_l1r_l2_svc(
 					loss_old = 0;
 					loss_new = 0;
 					x = prob_col->x[j];
-					if(nnz_per_feature[j] < omp_threshold) 
+					if(nnz_per_feature[j] < omp_threshold)
 					{
 						while(x->index != -1)
 						{
@@ -1756,10 +1763,10 @@ static void solve_l1r_l2_svc(
 								loss_new += C[GETI(ind)]*b_new*b_new;
 							x++;
 						}
-					} 
-					else 
+					}
+					else
 					{
-#pragma omp parallel for schedule(static) reduction(+: loss_old, loss_new)	
+#pragma omp parallel for schedule(static) reduction(+: loss_old, loss_new)
 						for(int k = 0; k < (int)nnz_per_feature[j]; k++)
 						{
 							feature_node *xk = x + k;
@@ -1777,7 +1784,7 @@ static void solve_l1r_l2_svc(
 				{
 					loss_new = 0;
 					x = prob_col->x[j];
-					if(nnz_per_feature[j] < omp_threshold) 
+					if(nnz_per_feature[j] < omp_threshold)
 					{
 						while(x->index != -1)
 						{
@@ -1788,10 +1795,10 @@ static void solve_l1r_l2_svc(
 								loss_new += C[GETI(ind)]*b_new*b_new;
 							x++;
 						}
-					} 
-					else 
+					}
+					else
 					{
-#pragma omp parallel for schedule(static) reduction(+: loss_new)	
+#pragma omp parallel for schedule(static) reduction(+: loss_new)
 						for(int k = 0; k < (int)nnz_per_feature[j]; k++)
 						{
 							feature_node *xk = x + k;
@@ -1821,7 +1828,7 @@ static void solve_l1r_l2_svc(
 			if(num_linesearch >= max_num_linesearch)
 			{
 				info("#");
-#pragma omp parallel for schedule(static) 
+#pragma omp parallel for schedule(static)
 				for(int i=0; i<l; i++)
 					b[i] = 1;
 
@@ -1829,7 +1836,7 @@ static void solve_l1r_l2_svc(
 				{
 					if(w[i]==0) continue;
 					x = prob_col->x[i];
-					if(nnz_per_feature[j] < omp_threshold) 
+					if(nnz_per_feature[j] < omp_threshold)
 						sparse_operator::axpy(-w[i], x, b);
 					else
 						sparse_operator::axpy_omp(-w[i], x, b, nnz_per_feature[i]);
@@ -1916,9 +1923,10 @@ static void solve_l1r_lr(
 	const problem *prob_col, double *w, double eps,
 	double Cp, double Cn)
 {
-	int l = prob_col->l;
+	long long l = prob_col->l;
 	int w_size = prob_col->n;
-	int j, s, newton_iter=0, iter=0;
+	long long j;
+	int s, newton_iter=0, iter=0;
 	int max_newton_iter = 100;
 	int max_iter = 1000;
 	int max_num_linesearch = 20;
@@ -2073,7 +2081,7 @@ static void solve_l1r_lr(
 		QP_Gmax_old = INF;
 		QP_active_size = active_size;
 
-#pragma omp parallel for 
+#pragma omp parallel for
 		for(int i=0; i<l; i++)
 			xTd[i] = 0;
 
@@ -2108,7 +2116,7 @@ static void solve_l1r_lr(
 				else
 				{
 					double tmp = 0;
-#pragma omp parallel for schedule(static) reduction(+: tmp)	
+#pragma omp parallel for schedule(static) reduction(+: tmp)
 					for(int k = 0; k < nnz_per_feature[j]; k++)
 					{
 						feature_node *xk = x + k;
@@ -2189,7 +2197,7 @@ static void solve_l1r_lr(
 
 		delta = 0;
 		w_norm_new = 0;
-#pragma omp parallel for schedule(static) reduction(+: delta, w_norm_new)	
+#pragma omp parallel for schedule(static) reduction(+: delta, w_norm_new)
 		for(j=0; j<w_size; j++)
 		{
 			delta += Grad[j]*(wpd[j]-w[j]);
@@ -2199,7 +2207,7 @@ static void solve_l1r_lr(
 		delta += (w_norm_new-w_norm);
 
 		negsum_xTd = 0;
-#pragma omp parallel for schedule(static) reduction(+: negsum_xTd)	
+#pragma omp parallel for schedule(static) reduction(+: negsum_xTd)
 		for(int i=0; i<l; i++)
 			if(y[i] == -1)
 				negsum_xTd += C[GETI(i)]*xTd[i];
@@ -2209,7 +2217,7 @@ static void solve_l1r_lr(
 		{
 			cond = w_norm_new - w_norm + negsum_xTd - sigma*delta;
 
-#pragma omp parallel for schedule(static) reduction(+: cond)	
+#pragma omp parallel for schedule(static) reduction(+: cond)
 			for(int i=0; i<l; i++)
 			{
 				double exp_xTd = exp(xTd[i]);
@@ -2324,8 +2332,8 @@ static void solve_l1r_lr(
 // transpose matrix X from row format to column format
 static void transpose(const problem *prob, feature_node **x_space_ret, problem *prob_col)
 {
-	int i;
-	int l = prob->l;
+	long long i;
+	long long l = prob->l;
 	int n = prob->n;
 	size_t nnz = 0;
 	size_t *col_ptr = new size_t [n+1];
@@ -2381,13 +2389,13 @@ static void transpose(const problem *prob, feature_node **x_space_ret, problem *
 // perm, length l, must be allocated before calling this subroutine
 static void group_classes(const problem *prob, int *nr_class_ret, int **label_ret, int **start_ret, int **count_ret, int *perm)
 {
-	int l = prob->l;
+	long long l = prob->l;
 	int max_nr_class = 16;
 	int nr_class = 0;
 	int *label = Malloc(int,max_nr_class);
 	int *count = Malloc(int,max_nr_class);
 	int *data_label = Malloc(int,l);
-	int i;
+	long long i;
 
 	for(i=0;i<l;i++)
 	{
@@ -2603,7 +2611,7 @@ static double calc_start_C(const problem *prob, const parameter *param)
 model* train(const problem *prob, const parameter *param)
 {
 	int i,j;
-	int l = prob->l;
+	long long l = prob->l;
 	int n = prob->n;
 	int w_size = prob->n;
 	model *model_ = Malloc(model,1);
@@ -2752,9 +2760,9 @@ model* train(const problem *prob, const parameter *param)
 
 void cross_validation(const problem *prob, const parameter *param, int nr_fold, double *target)
 {
-	int i;
+	long long i;
 	int *fold_start;
-	int l = prob->l;
+	long long l = prob->l;
 	int *perm = Malloc(int,l);
 	if (nr_fold > l)
 	{
@@ -2814,9 +2822,9 @@ void cross_validation(const problem *prob, const parameter *param, int nr_fold, 
 void find_parameter_C(const problem *prob, const parameter *param, int nr_fold, double start_C, double max_C, double *best_C, double *best_rate)
 {
 	// variables for CV
-	int i;
+	long long i;
 	int *fold_start;
-	int l = prob->l;
+	long long l = prob->l;
 	int *perm = Malloc(int, l);
 	double *target = Malloc(double, prob->l);
 	struct problem *subprob = Malloc(problem,nr_fold);
@@ -2967,9 +2975,9 @@ void find_parameter_C(const problem *prob, const parameter *param, int nr_fold, 
 	free(subprob);
 }
 
-double predict_values(const struct model *model_, const struct feature_node *x, double *dec_values)
+double predict_values(const struct model *model_, const struct feature_node *x, double *dec_values, const bool analyze, analysis *anal)
 {
-	int idx;
+	long long idx;
 	int n;
 	if(model_->bias>=0)
 		n=model_->nr_feature+1;
@@ -2987,16 +2995,27 @@ double predict_values(const struct model *model_, const struct feature_node *x, 
 	const feature_node *lx=x;
 	for(i=0;i<nr_w;i++)
 		dec_values[i] = 0;
+    vector<double> t;
+    vector<int> p;
 	for(; (idx=lx->index)!=-1; lx++)
 	{
 		// the dimension of testing data may exceed that of training
 		if(idx<=n)
-			for(i=0;i<nr_w;i++)
-				dec_values[i] += w[(idx-1)*nr_w+i]*lx->value;
+            for(i=0;i<nr_w;i++) {
+                double tmp_t = w[(idx-1)*nr_w+i]*lx->value;
+                dec_values[i] += tmp_t;
+                if(analyze && nr_class==2) {
+                    t.push_back(tmp_t);
+                }
+            }
 	}
 
 	if(nr_class==2)
 	{
+        if(analyze) {
+            anal->wa.push_back(t);
+            anal->pa.push_back(p);
+        }
 		if(check_regression_model(model_))
 			return dec_values[0];
 		else
@@ -3014,15 +3033,15 @@ double predict_values(const struct model *model_, const struct feature_node *x, 
 	}
 }
 
-double predict(const model *model_, const feature_node *x)
+double predict(const model *model_, const feature_node *x, const bool analyze, analysis *anal)
 {
 	double *dec_values = Malloc(double, model_->nr_class);
-	double label=predict_values(model_, x, dec_values);
+	double label=predict_values(model_, x, dec_values, analyze, anal);
 	free(dec_values);
 	return label;
 }
 
-double predict_probability(const struct model *model_, const struct feature_node *x, double* prob_estimates)
+double predict_probability(const struct model *model_, const struct feature_node *x, double* prob_estimates, const bool analyze, analysis *anal)
 {
 	if(check_probability_model(model_))
 	{
@@ -3034,7 +3053,7 @@ double predict_probability(const struct model *model_, const struct feature_node
 		else
 			nr_w = nr_class;
 
-		double label=predict_values(model_, x, prob_estimates);
+		double label=predict_values(model_, x, prob_estimates, analyze, anal);
 		for(i=0;i<nr_w;i++)
 			prob_estimates[i]=1/(1+exp(-prob_estimates[i]));
 
@@ -3162,7 +3181,7 @@ struct model *load_model(const char *model_file_name)
 	// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
 	param.nr_weight = 0;
 	param.weight_label = NULL;
-	param.weight = NULL;	
+	param.weight = NULL;
 	param.init_sol = NULL;
 
 	model_->label = NULL;
